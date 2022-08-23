@@ -5,6 +5,6 @@ module.exports = function(deployer, _network, accounts) {
     Multisig, 
     [accounts[0], accounts[1], accounts[2]], 
     2,
-    {value: 1000}
+    {value: 1000000}
   );
 };
