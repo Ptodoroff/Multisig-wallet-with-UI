@@ -23,7 +23,7 @@ contract Multisig {
         _;
 
     }
-    mapping (uint =>Transfer) transfers;                                        // a mapping that stores every transfer struct
+    mapping (uint =>Transfer) public transfers;                                        // a mapping that stores every transfer struct. Public visibility so that mocha can access it for testing
     uint nextId;
     mapping (address=>mapping(uint=>bool))  public approvals;                   // a mapping that stores if a certain transfer is approved by an address
     constructor (address[] memory _approvers, uint _approvals_num) payable {
