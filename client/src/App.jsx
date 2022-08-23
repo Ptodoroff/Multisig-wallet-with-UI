@@ -8,6 +8,7 @@ function App() {
   const [contract,setContract]=useState(undefined);
   const [accounts,setAccounts]=useState(undefined);
   const [balance,setBalance]= useState(undefined);
+  const [approvers, setApprovers]=useState(undefined);
 
   useEffect(()=>{
     let init = async  () =>{
@@ -34,6 +35,7 @@ function App() {
   useEffect (()=>{
     if(typeof web3 !=='undefined' && typeof contract!=='undefined'){
       showBalance();
+      showApprovers();
     }
 
   },[web3,contract,accounts])
@@ -43,6 +45,10 @@ function App() {
     setBalance(balance);
   }
 
+  async function showApprovers () {
+    const approvers = await contract.methods.approvers(0).call()
+    setApprovers(approvers);
+  }
  
   
 
@@ -55,7 +61,7 @@ function App() {
   </div>
   <div className="row">
   <p className="balance col-sm-12"> Balance:{balance}   </p>
-  <p className="approvers col-sm-12">Approvers:    </p>
+  <p className="approvers col-sm-12">Approvers: {approvers}   </p>
   <p className="approvers col-sm-12">Minimum approvers needed:    </p>
   </div>
 

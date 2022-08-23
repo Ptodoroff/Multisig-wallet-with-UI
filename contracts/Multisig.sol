@@ -3,7 +3,7 @@ pragma solidity  ^0.8.15;
 
 contract Multisig {
     address [] public approvers;                                                    //list of addresses , allowed to approve
-    uint approvals_num;                                                             //required approves
+    uint public approvals_num;                                                             //required approves
     struct Transfer {                                                               // a transaction struct
         uint _id;
         uint _amount;
@@ -67,5 +67,9 @@ contract Multisig {
 
 
         }
+
+    
     }
+
+    fallback () external payable {}
 }
