@@ -9,6 +9,8 @@ function App() {
   const [accounts,setAccounts]=useState(undefined);
   const [balance,setBalance]= useState(undefined);
   const [approvers, setApprovers]=useState(undefined);
+  const [approvalsRequired, setApprovalsRequired]=useState(undefined);
+  const [remApp,setRemApp]=useState(undefined);
 
   useEffect(()=>{
     let init = async  () =>{
@@ -36,6 +38,7 @@ function App() {
     if(typeof web3 !=='undefined' && typeof contract!=='undefined'){
       showBalance();
       showApprovers();
+      setApprovalsNeeded();
     }
 
   },[web3,contract,accounts])
@@ -46,9 +49,35 @@ function App() {
   }
 
   async function showApprovers () {
-    const approvers = await contract.methods.approvers(0).call()
-    setApprovers(approvers);
+    const approvers1 = await contract.methods.approvers(0).call();
+    const approvers2= await contract.methods.approvers(1).call();
+    setApprovers(approvers1 + " | " + approvers2);
   }
+
+  async function setApprovalsNeeded () {
+    const approvalsNeeded =  2;
+    setApprovalsRequired(approvalsNeeded);
+  }
+
+  async function createTransfer (e) {
+    e.preventDefault();
+    let amount = e.target.elements[0].value;
+    let recipient = e.target.elements[1].value;
+    await contract.methods.createTransfer(amount,recipient).send({from:accounts[0]})
+  }
+
+  async function sendTransfer (e){
+    e.preventDefault();
+    let id = e.target.elements[0].value;
+    await contract.methods.sendTransfer(id).send({from:accounts[0]});
+    let tx =  await contract.methods.transfers(id).call();
+    let result = await tx._approvals;
+   
+    setRemApp(result);
+  }
+
+ 
+  
  
   
 
@@ -62,11 +91,11 @@ function App() {
   <div className="row">
   <p className="balance col-sm-12"> Balance:{balance}   </p>
   <p className="approvers col-sm-12">Approvers: {approvers}   </p>
-  <p className="approvers col-sm-12">Minimum approvers needed:    </p>
+  <p className="approvers col-sm-12">Minimum approvers needed:{approvalsRequired}    </p>
   </div>
 
   <div>
-    <form className="form-control">
+    <form className="form-control" onSubmit={e=>createTransfer(e)}>
     <label htmlFor="createTransfer"> Create Transfer</label>
     <label htmlFor="amount" className="col-sm-12"> Amount</label>
      <input type="number" id="amount"/>
@@ -79,13 +108,13 @@ function App() {
   <br/>
 
   <div>
-    <form className="form-control">
+    <form className="form-control" onSubmit={e=>sendTransfer(e)}>
     <label htmlFor="csendTransfer"> Send Transfer</label>
     <label htmlFor="amount" className="col-sm-12"> Transcation Id</label>
-     <input type="number" id="amount"/>
+     <input type="number" id="IdentificationNum"/>
      <p></p>
     <button type="submit" className="btn btn-success">Approve transfer</button>
-    <p className="approvals-remaining">Remaining approvals for this transfer:</p>
+    <p className="approvals-remaining">Remaining approvals for this transfer: {remApp}</p>
     </form>
   </div>
 

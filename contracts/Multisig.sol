@@ -3,7 +3,7 @@ pragma solidity  ^0.8.15;
 
 contract Multisig {
     address [] public approvers;                                                    //list of addresses , allowed to approve
-    uint public approvals_num;                                                             //required approves
+    uint public approvalsNum;                                                             //required approves
     struct Transfer {                                                               // a transaction struct
         uint _id;
         uint _amount;
@@ -28,7 +28,7 @@ contract Multisig {
     mapping (address=>mapping(uint=>bool))  public approvals;                   // a mapping that stores if a certain transfer is approved by an address
     constructor (address[] memory _approvers, uint _approvals_num) payable {
         approvers=_approvers;
-        approvals_num=_approvals_num;
+        approvalsNum=_approvals_num;
 
     }
 
@@ -47,7 +47,7 @@ contract Multisig {
 
     function sendTransfer (uint id) external  Approver {                            //sends the transaction (input is the index of the transfer mapping)
         require (transfers[id]._sent == false, "The transaction has been sent already");
-        if (transfers[id]._approvals >=approvals_num) {
+        if (transfers[id]._approvals >=approvalsNum) {
             transfers[id]._sent = true;
             address payable to = transfers[id]._to;
             uint amount = transfers[id]._amount;
