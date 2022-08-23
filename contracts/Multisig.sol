@@ -2,9 +2,9 @@ pragma solidity  ^0.8.15;
 
 
 contract Multisig {
-    address [] public approvers;
-    uint approvals_num;
-    struct Transfer {
+    address [] public approvers;                                                    //list of addresses , allowed to approve
+    uint approvals_num;                                                             //required approves
+    struct Transfer {                                                               // a transaction struct
         uint _id;
         uint _amount;
         address payable _to;
@@ -12,7 +12,7 @@ contract Multisig {
         bool _sent;
     }
 
-    modifier Approver (){
+    modifier Approver (){                                                          //an approver modifier that loops through the approvers array and  checks if the msg.sender is included
         bool approved = false;
         for (uint i=0; i<approvers.length; i++) {
             if (approvers[i]==msg.sender){
@@ -23,16 +23,16 @@ contract Multisig {
         _;
 
     }
-    mapping (uint =>Transfer) transfers;
+    mapping (uint =>Transfer) transfers;                                        // a mapping that stores every transfer struct
     uint nextId;
-    mapping (address=>mapping(uint=>bool))  public approvals;
+    mapping (address=>mapping(uint=>bool))  public approvals;                   // a mapping that stores if a certain transfer is approved by an address
     constructor (address[] memory _approvers, uint _approvals_num) payable {
         approvers=_approvers;
         approvals_num=_approvals_num;
 
     }
 
-    function createTransfer (uint amount, address payable to) external  Approver {
+    function createTransfer (uint amount, address payable to) external  Approver {     //instantiates the transaction struct
         transfers[nextId]=Transfer (
             nextId,
             amount,
@@ -45,7 +45,7 @@ contract Multisig {
         
     }
 
-    function sendTransfer (uint id) external  Approver {
+    function sendTransfer (uint id) external  Approver {                            //sends the transaction (input is the index of the transfer mapping)
         require (transfers[id]._sent == false, "The transaction has been sent already");
         if (transfers[id]._approvals >=approvals_num) {
             transfers[id]._sent = true;
@@ -59,7 +59,7 @@ contract Multisig {
             return;
 
         }
-        if (approvals[msg.sender][id]==false) {
+        if (approvals[msg.sender][id]==false) {                                     //if the transfer does not have the required number of approvals, the approvals increment by one.
             approvals[msg.sender][id]=true;
             transfers[id]._approvals ++;
 
